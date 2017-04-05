@@ -39,6 +39,8 @@ Changelog
 - Updated german translation
   [tomgross]
 
+- Remove hard dependency for collective.indexing (for Plone 5.1)
+  [tomgross]
 
 6.0a1 (2016-10-11)
 ------------------
