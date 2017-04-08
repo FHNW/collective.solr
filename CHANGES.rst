@@ -39,6 +39,9 @@ Changelog
 - Remove hard dependency for collective.indexing (for Plone 5.1)
   [tomgross]
 
+- Allow multicore queries
+  [tomgross]
+
 6.0a1 (2016-10-11)
 ------------------
 
