@@ -8,8 +8,8 @@ cache:
   directories:
     - $HOME/buildout-cache
 env:
-  - PLONE_VERSION=4.3.x SOLR_VERSION=4.10.x
-  - PLONE_VERSION=5.0.x SOLR_VERSION=4.10.x
+#  - PLONE_VERSION=4.3.x SOLR_VERSION=4.10.x
+#  - PLONE_VERSION=5.0.x SOLR_VERSION=4.10.x
   - PLONE_VERSION=5.1.x SOLR_VERSION=4.10.x
 #  - PLONE_VERSION=4.3.x SOLR_VERSION=5.1.x
 #  - PLONE_VERSION=5.0.x SOLR_VERSION=5.1.x
@@ -23,6 +23,7 @@ before_install:
   - mkdir -p $HOME/buildout-cache/{eggs,downloads}
   - virtualenv .
   - bin/pip install --upgrade pip setuptools zc.buildout zest.pocompile
+  - if [ $PLONE_VERSION == 5.1.x ]; then pip install --upgrade appdirs==1.4.2 packaging==16.8 pyparsing==2.1.10; fi
   - bin/pocompile src
 install:
   - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
