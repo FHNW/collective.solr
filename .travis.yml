@@ -22,13 +22,13 @@ before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
   - virtualenv .
-  - pip install --upgrade pip setuptools zc.buildout zest.pocompile
-  - pip install --upgrade appdirs==1.4.2 packaging==16.8 pyparsing==2.1.10
+  - bin/pip install --upgrade pip setuptools==34.3.0 zc.buildout==2.8.0 zest.pocompile
+  - bin/pip install --upgrade appdirs==1.4.2 packaging==16.8 pyparsing==2.1.10
   - bin/pocompile src
 install:
   - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
   - sed -ie "s#solr-x.x.x.cfg#solr-$SOLR_VERSION.cfg#" travis.cfg
-  - buildout -N -t 20 -c travis.cfg buildout:download-cache=downloads
+  - bin/buildout -N -t 20 -c travis.cfg buildout:download-cache=downloads
 script:
   - bin/code-analysis
   - bin/coverage run bin/test
