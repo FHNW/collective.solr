@@ -6,7 +6,8 @@ python:
 cache:
   pip: true
   directories:
-    - $HOME/buildout-cache
+    - downloads
+    - eggs
 env:
 #  - PLONE_VERSION=4.3.x SOLR_VERSION=4.10.x
 #  - PLONE_VERSION=5.0.x SOLR_VERSION=4.10.x
@@ -20,15 +21,14 @@ env:
 before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - mkdir -p $HOME/buildout-cache/{eggs,downloads}
   - virtualenv .
-  - bin/pip install --upgrade pip setuptools zc.buildout zest.pocompile
-  - if [ $PLONE_VERSION == 5.1.x ]; then pip install --upgrade appdirs==1.4.2 packaging==16.8 pyparsing==2.1.10; fi
+  - pip install --upgrade pip setuptools zc.buildout zest.pocompile
+  - pip install --upgrade appdirs==1.4.2 packaging==16.8 pyparsing==2.1.10
   - bin/pocompile src
 install:
   - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
   - sed -ie "s#solr-x.x.x.cfg#solr-$SOLR_VERSION.cfg#" travis.cfg
-  - bin/buildout -N -t 20 -c travis.cfg
+  - buildout -N -t 20 -c travis.cfg buildout:download-cache=downloads
 script:
   - bin/code-analysis
   - bin/coverage run bin/test
