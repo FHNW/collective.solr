@@ -28,7 +28,7 @@ before_install:
 install:
   - sed -ie "s#plone-x.x.x.cfg#plone-$PLONE_VERSION.cfg#" travis.cfg
   - sed -ie "s#solr-x.x.x.cfg#solr-$SOLR_VERSION.cfg#" travis.cfg
-  - buildout -N -t 20 -c travis.cfg buildout:download-cache=downloads
+  - bin/buildout -N -t 20 -c travis.cfg buildout:download-cache=downloads
 script:
   - bin/code-analysis
   - bin/coverage run bin/test
