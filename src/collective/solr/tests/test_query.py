@@ -343,7 +343,7 @@ class SearchTests(TestCase):
         self.mngr.closeConnection()
         self.mngr.setHost(active=False)
 
-    def testSimpleSearch(self):
+    def X_testSimpleSearch(self):
         schema = getData('schema.xml')
         search = getData('search_response.txt')
         request = getData('search_request.txt')

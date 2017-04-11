@@ -281,6 +281,7 @@ class SolrMaintenanceTests(TestCase):
         # ignore_exceptions=False should raise the handler's exception,
         # thereby aborting the reindex tx
         maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
+        maintenance.clear()
         self.assertRaises(Exception,
                           maintenance.reindex,
                           ignore_exceptions=False)
