@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from zope.component import queryUtility
-from zope.interface import implements
+from zope.interface import implementer
 from zope.schema.interfaces import IBaseVocabulary
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
@@ -13,9 +13,9 @@ from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
 
 
+@implementer(IVocabularyFactory)
 class SolrIndexes(object):
     """ vocabulary provider yielding all available solr indexes """
-    implements(IVocabularyFactory)
 
     def __call__(self, context):
         items = []
@@ -32,11 +32,11 @@ class SolrIndexes(object):
         return SimpleVocabulary([SimpleTerm(item) for item in items])
 
 
+@implementer(IBaseVocabulary)
 class I18NFacetTitles(object):
     """Vocabulary that wraps any term into message ids in the solr translation
     domain. This is generally the default behaviour for facet titles.
     """
-    implements(IBaseVocabulary)
 
     def __contains__(self, term):
         return True
@@ -50,8 +50,8 @@ class I18NFacetTitles(object):
         return SimpleTerm(value, term, title)
 
 
+@implementer(IFacetTitleVocabularyFactory)
 class I18NFacetTitlesVocabularyFactory(object):
-    implements(IFacetTitleVocabularyFactory)
 
     def __call__(self, context):
         return I18NFacetTitles()

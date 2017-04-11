@@ -17,8 +17,7 @@ setup(
         'Development Status :: 5 - Production/Stable',
         'Environment :: Web Environment',
         'Framework :: Plone',
-        'Framework :: Plone :: 4.3',
-        'Framework :: Plone :: 5.0',
+        'Framework :: Plone :: 5.1',
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
         'Intended Audience :: Other Audience',
@@ -44,7 +43,7 @@ setup(
         'Acquisition',
         'DateTime',
         'Products.CMFCore',
-        'Products.CMFPlone >= 4.3.7',
+        'Products.CMFPlone >= 5.1b2',
         'Products.GenericSetup',
         'Zope2 >= 2.13',
         'lxml',
@@ -69,11 +68,6 @@ setup(
             'plone.app.testing[robot]',
             'plone.app.robotframework[debug]',
         ],
-        'test4': [
-            'Products.LinguaPlone >=3.1a1',
-            'plone.app.robotframework[debug]',
-            'plone.app.testing[robot]',
-        ]
     },
     entry_points='''
       [z3c.autoinclude.plugin]

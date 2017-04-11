@@ -9,11 +9,11 @@ from plone.registry.interfaces import IRegistry
 from Products.CMFPlone.browser.ploneview import Plone as PloneView
 from zope.component import getMultiAdapter, getUtility
 from zope.globalrequest import getRequest
-from zope.interface import implements
+from zope.interface import implementer
 
 
+@implementer(IContentListingObject)
 class FlareContentListingObject(BaseContentListingObject):
-    implements(IContentListingObject)
 
     def __init__(self, flare):
         self.flare = flare

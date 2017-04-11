@@ -85,12 +85,6 @@ exceptions. A normal plone instance would apply the patch automatically as
 its part of the `plone.app.linkintegrity` package. However, in a test
 environment that package isn't loaded by default, so we patch manually:
 
-  >>> try:
-  ...     from plone.app.linkintegrity.monkey import installExceptionHook
-  ...     installExceptionHook()   # Plone 4.3
-  ... except ImportError:
-  ...     pass   # no longer needed for Plone 5.x
-
 Now we can finally try to search again:
 
   >>> browser.reload()

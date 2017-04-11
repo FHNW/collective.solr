@@ -17,21 +17,16 @@ from collective.solr.utils import getConfig
 from logging import getLogger
 from time import time
 from zope.component import queryUtility
-from zope.interface import implements
+from zope.interface import implementer
 from Products.CMFPlone.utils import safe_unicode
 
-try:
-    from Products.LinguaPlone.catalog import languageFilter
-except ImportError:
-    def languageFilter(args):
-        pass
 
 logger = getLogger('collective.solr.search')
 
 
+@implementer(ISearch)
 class Search(object):
     """ a search utility for solr """
-    implements(ISearch)
 
     def __init__(self):
         self.manager = None
@@ -120,7 +115,6 @@ class Search(object):
         params = cleanupQueryParameters(params, schema)
         config = self.getConfig()
 
-        languageFilter(args)
         prepareData(args)
         mangleQuery(args, config, schema)
 

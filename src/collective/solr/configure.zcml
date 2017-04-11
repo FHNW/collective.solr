@@ -12,9 +12,6 @@
 
   <i18n:registerTranslations directory="locales" />
 
-  <include package="collective.indexing" 
-       zcml:condition="installed collective.indexing" />
-
   <include package="plone.browserlayer" />
   <include package="plone.app.registry" />
   <include package="plone.restapi" />
@@ -38,34 +35,6 @@
         factory=".dispatcher.SearchDispatcher" />
 
 
-    <configure zcml:condition="installed Products.Archetypes">
-
-      <!-- Schema extender -->
-      <include file="extender.zcml" />
-
-      <!-- Adder adapter for Archetypes-->
-      <adapter
-	  factory=".indexer.DefaultAdder"
-	  for="Products.Archetypes.interfaces.IBaseObject"
-	  name="default"
-	  />
-
-      <adapter
-	  factory=".indexer.BinaryAdder"
-	  for="Products.Archetypes.interfaces.IBaseObject"
-	  name="File"
-	  />
-
-      <adapter
-	  factory=".indexer.BinaryAdder"
-	  for="Products.Archetypes.interfaces.IBaseObject"
-	  name="Image"
-	  />
-    </configure>
-    <configure zcml:condition="installed plone.dexterity">
-
-      <include package="plone.dexterity" file="meta.zcml" />
-      <include package="plone.dexterity"  />
 
       <!-- Schema extender as behavior -->
       <plone:behavior
@@ -94,7 +63,6 @@
 	  for="plone.dexterity.interfaces.IDexterityContent"
 	  name="Image"
 	  />
-    </configure>
 
     <adapter
         factory=".indexer.BaseIndexable" />
@@ -133,13 +101,11 @@
   <adapter name="path_parents" factory=".attributes.path_parents" />
 
   <adapter
-      zcml:condition="installed plone.app.contentlisting"
       factory="plone.app.contentlisting.contentlisting.ContentListing"
       for="collective.solr.parser.SolrResponse"
       />
 
   <adapter
-      zcml:condition="installed plone.app.contentlisting"
       factory="collective.solr.contentlisting.FlareContentListingObject"
       for="collective.solr.flare.PloneFlare"
       />
@@ -158,7 +124,5 @@
     name="collective.solr.static"
     directory="static" 
     />
-
-  <include package="plone.behavior" file="meta.zcml" />
 
 </configure>

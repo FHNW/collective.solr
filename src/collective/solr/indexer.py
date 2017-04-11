@@ -5,19 +5,15 @@ from Acquisition import aq_get
 from DateTime import DateTime
 from datetime import date, datetime
 from zope.component import queryUtility, queryMultiAdapter
-from zope.component import queryAdapter, adapts
-from zope.interface import implements
+from zope.component import queryAdapter, adapter
+from zope.interface import implementer
 from zope.interface import Interface
 from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
 from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
-try:   # pragma: no cover
-    from plone.app.content.interfaces import IIndexableObjectWrapper
-except ImportError:  # pragma: no cover
-    # Plone 5
-    from plone.indexer.interfaces import IIndexableObjectWrapper
+from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
 from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
@@ -36,10 +32,9 @@ from urllib import urlencode
 logger = getLogger('collective.solr.indexer')
 
 
+@implementer(ICheckIndexable)
+@adapter(Interface)
 class BaseIndexable(object):
-
-    implements(ICheckIndexable)
-    adapts(Interface)
 
     def __init__(self, context):
         self.context = context
@@ -95,11 +90,10 @@ handlers = {
 }
 
 
+@implementer(ISolrAddHandler)
 class DefaultAdder(object):
     """
     """
-
-    implements(ISolrAddHandler)
 
     def __init__(self, context):
         self.context = context
@@ -177,9 +171,9 @@ def boost_values(obj, data):
         return boost_index_getter(data)
 
 
+@implementer(ISolrIndexQueueProcessor)
 class SolrIndexProcessor(object):
     """ a queue processor for solr """
-    implements(ISolrIndexQueueProcessor)
 
     def __init__(self, manager=None):
         self.manager = manager
@@ -211,9 +205,12 @@ class SolrIndexProcessor(object):
                     attributes.extend(['path_string', 'path_parents',
                                        'path_depth'])
 
-                attributes = set(schema.keys()).intersection(attributes)
-                if not attributes:
-                    return
+                if attributes:
+                    attributes = set(schema.keys()).intersection(attributes)
+                    if not attributes:
+                        return
+                else:
+                    attributes = schema.keys()
 
                 if uniqueKey not in attributes:
                     # The uniqueKey is required in order to identify the

@@ -9,28 +9,28 @@ from collective.solr.utils import isActive
 from httplib import CannotSendRequest
 from httplib import ResponseNotReady
 from logging import getLogger
-from socket import error
-from zope.component import queryUtility
-from zope.interface import implements
 from plone.registry.interfaces import IRegistry
+from socket import error
+from zope.interface import implementer
 from zope.component import getUtility
+from zope.component import queryUtility
 
 logger = getLogger('collective.solr.manager')
 marker = object()
 
 
+@implementer(IZCMLSolrConnectionConfig)
 class ZCMLSolrConnectionConfig(object):
     '''Connection values that can be configured through zcml'''
-    implements(IZCMLSolrConnectionConfig)
 
     def __init__(self, host, port, base):
         self.host = '%s:%d' % (host, port)
         self.base = base
 
 
+@implementer(ISolrConnectionManager)
 class SolrConnectionManager(object):
     """ a thread-local connection manager for solr """
-    implements(ISolrConnectionManager)
 
     lock = False
 

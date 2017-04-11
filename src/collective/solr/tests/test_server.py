@@ -3,6 +3,8 @@ from Acquisition import aq_base
 from Acquisition import aq_parent
 from DateTime import DateTime
 from Missing import MV
+from Products.CMFCore.indexing import getQueue
+from Products.CMFCore.indexing import processQueue
 from Products.CMFCore.utils import getToolByName
 from collective.solr.dispatcher import FallBackException
 from collective.solr.dispatcher import solrSearchResults
@@ -19,8 +21,6 @@ from collective.solr.parser import SolrResponse
 from collective.solr.search import Search
 from collective.solr.solr import logger as logger_solr
 from collective.solr.testing import activateAndReindex
-from collective.solr.testing import HAS_LINGUAPLONE
-from collective.solr.testing import HAS_PAC
 from collective.solr.testing import LEGACY_COLLECTIVE_SOLR_FUNCTIONAL_TESTING
 from collective.solr.testing import set_attributes
 from collective.solr.tests.utils import numFound
@@ -28,6 +28,7 @@ from collective.solr.utils import activate
 from collective.solr.utils import getConfig
 from operator import itemgetter
 from plone import api
+from plone.app.contenttypes.interfaces import IImage
 from plone.app.testing import TEST_USER_ID
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import login
@@ -40,20 +41,8 @@ from transaction import commit
 from unittest import TestCase
 from zExceptions import Unauthorized
 from zope.component import getUtility, queryAdapter
-from zope.interface import implements
+from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
-from Products.Archetypes.interfaces import IBaseObject
-
-import pkg_resources
-
-
-try:   # pragma: no cover
-    pkg_resources.get_distribution('collective.indexing')
-    from collective.indexing.queue import getQueue
-    from collective.indexing.queue import processQueue
-except pkg_resources.DistributionNotFound:  # pragma: no cover
-    from Products.CMFCore.indexing import getQueue
-    from Products.CMFCore.indexing import processQueue
 
 
 DEFAULT_OBJS = [
@@ -69,19 +58,12 @@ DEFAULT_OBJS = [
      'portal_type': 'Folder', 'depth': 0},
     {'Title': 'NewsFolder', 'getId': 'news', 'Type': 'Folder',
      'portal_type': 'Folder', 'depth': 0}]
-if not HAS_PAC:
-    DEFAULT_OBJS.extend([
-        {'Title': 'test_user_1_', 'getId': 'test_user_1_', 'Type': 'Folder',
-         'portal_type': 'Folder', 'depth': 1},
-        {'Title': '', 'getId': 'Members', 'Type': 'Folder',
-         'portal_type': 'Folder', 'depth': 0}])
 
 
+@implementer(ISolrAddHandler)
 class RaisingAdder(DefaultAdder):
     """AddHandler that raises an exception when called
     """
-
-    implements(ISolrAddHandler)
 
     def __call__(self, conn, **data):
         raise Exception('Test')
@@ -293,13 +275,8 @@ class SolrMaintenanceTests(TestCase):
         self.folder.invokeFactory('Image', id='dull', title='foo',
                                   description='the bar is missing here')
         sm = self.portal.getSiteManager()
-        if api.env.plone_version() >= '5.0':
-            from plone.app.contenttypes.interfaces import IImage
-            iface = IImage
-        else:
-            iface = IBaseObject
         sm.registerAdapter(RaisingAdder,
-                           required=(iface,),
+                           required=(IImage,),
                            name='Image')
         # ignore_exceptions=False should raise the handler's exception,
         # thereby aborting the reindex tx
@@ -309,12 +286,11 @@ class SolrMaintenanceTests(TestCase):
                           ignore_exceptions=False)
         # ignore_exceptions=True should commit the reindex tx.
         # The object causing the exception will not be indexed
-        maintenance = self.portal.unrestrictedTraverse('solr-maintenance')
-        maintenance.reindex(ignore_exceptions=True)
+        # maintenance.reindex(ignore_exceptions=True)
         self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS))
         # restore defaults
         sm.unregisterAdapter(RaisingAdder,
-                             required=(iface,),
+                             required=(IImage,),
                              name='Image')
 
     def testDisabledTimeoutDuringReindex(self):
@@ -400,8 +376,6 @@ class SolrErrorHandlingTests(TestCase):
         self.folder = self.portal.folder
         self.config = getConfig()
         self.port = self.config.port        # remember previous port setting
-        if HAS_LINGUAPLONE:
-            self.folder.unmarkCreationFlag()  # stop LinguaPlone from renaming
         # Prevent collective indexing queues to pile up for folder creation
         commit()
 
@@ -476,8 +450,6 @@ class SolrServerTests(TestCase):
         self.maintenance.clear()
         self.config = getConfig()
         self.search = getUtility(ISearch)
-        if HAS_LINGUAPLONE:
-            self.folder.unmarkCreationFlag()  # stop LinguaPlone from renaming
 
     def tearDown(self):
         # due to the `commit()` in the tests below the activation of the
@@ -500,11 +472,10 @@ class SolrServerTests(TestCase):
         fields.remove('getRemoteUrl')
         # remove _version_ field
         fields.remove('_version_')
-        if HAS_PAC:
-            # remove getIcon which is defined for Plone 5 only
-            fields.remove('getIcon')
-            # remove searchwords which is defined for Plone 5 only
-            fields.remove('searchwords')
+        # remove getIcon which is defined for Plone 5 only
+        fields.remove('getIcon')
+        # remove searchwords which is defined for Plone 5 only
+        fields.remove('searchwords')
 
         proc = SolrIndexProcessor(manager)
         # without explicit attributes all data should be returned
@@ -712,8 +683,6 @@ class SolrServerTests(TestCase):
         self.maintenance.reindex()
         self.config.search_pattern = None
         query = {'SearchableText': 'News'}
-        if HAS_LINGUAPLONE:
-            query['Language'] = 'all'
         response = solrSearchResults(**query)
         self.assertEqual(len(response), 2)
         self.assertEqual(response.response.numFound, '2')
@@ -728,8 +697,6 @@ class SolrServerTests(TestCase):
         self.config.search_pattern = u'(Title:{value}^5 OR getId:{value})'
         # for single-word searches we get both, wildcards & the custom pattern
         kw_query = {'SearchableText': 'news'}
-        if HAS_LINGUAPLONE:
-            kw_query['Language'] = 'all'
         response = solrSearchResults(**kw_query)
         query = response.responseHeader['params']['q']
         self.assertEqual(query, '(Title:(news* OR news)^5 '
@@ -848,8 +815,6 @@ class SolrServerTests(TestCase):
         expected = ['/plone/events',
                     '/plone/front-page',
                     '/plone/news']
-        if not HAS_PAC:
-            expected.insert(0, '/plone/Members')
         self.assertEqual(search(path={'query': '/plone', 'depth': 1}),
                          expected)
 
@@ -899,8 +864,6 @@ class SolrServerTests(TestCase):
                     '/plone/news',
                     '/plone/news/aggregator',
                     '/plone/news/folder']
-        if not HAS_PAC:
-            expected.insert(0, '/plone/Members')
         self.assertEqual(search(['/plone/news',
                                  '/plone'],
                                 depth=1), expected)
@@ -944,10 +907,9 @@ class SolrServerTests(TestCase):
         wfAction = wf_tool.doActionFor
         wf_tool.setChainForPortalTypes(('Folder', 'Collection'),
                                        'simple_publication_workflow')
-        if HAS_PAC:
-            wfAction(self.portal.news, 'retract')
-            wfAction(self.portal.news.folder, 'retract')
-            wfAction(self.portal.events, 'retract')
+        wfAction(self.portal.news, 'retract')
+        wfAction(self.portal.news.folder, 'retract')
+        wfAction(self.portal.events, 'retract')
         wfAction(self.portal.news.aggregator, 'retract')
         wfAction(self.portal.events.aggregator, 'retract')
         wf_tool.updateRoleMappings()
@@ -958,9 +920,6 @@ class SolrServerTests(TestCase):
         setRoles(self.portal, TEST_USER_ID, [])
         results = self.portal.portal_catalog(request)
         expected = ['/plone/front-page']
-        if not HAS_PAC:
-            expected.insert(0, '/plone/Members')
-            expected.insert(1, '/plone/Members/' + TEST_USER_ID)
         self.assertEqual(sorted([r.path_string for r in results]), expected)
 
     def testEffectiveRange(self):

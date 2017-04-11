@@ -4,12 +4,7 @@ from collective.solr.utils import activate
 from plone.app.robotframework.testing import REMOTE_LIBRARY_BUNDLE_FIXTURE
 from plone.app.testing import FunctionalTesting
 from plone.app.testing import IntegrationTesting
-try:  # pragma: no cover
-    from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE as PLONE_FIXTURE  # noqa
-    HAS_PAC = True
-except ImportError:  # pragma: no cover
-    from plone.app.testing.bbb import PTC_FIXTURE as PLONE_FIXTURE
-    HAS_PAC = False
+from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
 from plone.app.testing import PloneSandboxLayer
 from plone.app.testing import TEST_USER_NAME
 from plone.app.testing import applyProfile
@@ -17,7 +12,6 @@ from plone.app.testing import login
 from plone.registry.interfaces import IRegistry
 from plone.testing import Layer
 from plone.testing import z2
-from plone.testing.z2 import installProduct
 from plone.api.portal import set_registry_record
 from zope.interface import implementer
 from zope.component import provideUtility
@@ -27,15 +21,9 @@ import os
 import sys
 import urllib2
 import subprocess
-import pkg_resources
+
 
 BIN_DIR = os.path.dirname(os.path.realpath(sys.argv[0]))
-
-try:   # pragma: no cover
-    pkg_resources.get_distribution('Products.LinguaPlone')
-    HAS_LINGUAPLONE = True
-except pkg_resources.DistributionNotFound:  # pragma: no cover
-    HAS_LINGUAPLONE = False
 
 
 class SolrLayer(Layer):
@@ -108,7 +96,7 @@ SOLR_FIXTURE = SolrLayer()
 
 class CollectiveSolrLayer(PloneSandboxLayer):
 
-    defaultBases = (PLONE_FIXTURE, )
+    defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE, )
 
     def __init__(
             self,
@@ -136,17 +124,8 @@ class CollectiveSolrLayer(PloneSandboxLayer):
 
     def setUpZope(self, app, configurationContext):
         # Load ZCML
-        try:   # pragma: no cover
-            pkg_resources.get_distribution('collective.indexing')
-            import collective.indexing
-            self.loadZCML(package=collective.indexing)
-            HAS_C_INDEXING = True
-        except pkg_resources.DistributionNotFound:  # pragma: no cover
-            HAS_C_INDEXING = False
         import collective.solr
         self.loadZCML(package=collective.solr)
-        if HAS_C_INDEXING:  # pragma: no cover
-            installProduct(app, 'collective.indexing')
 
     def setUpPloneSite(self, portal):
         self.solr_layer.setUp()
@@ -277,11 +256,8 @@ class CollectiveSolrMockRegistryLayer(Layer):
 
 
 def set_attributes(context, values):  # pragma: no cover
-    if HAS_PAC:
-        for key, value in values.iteritems():
-            setattr(context, key, value)
-    else:
-        context.processForm(values=values)
+    for key, value in values.iteritems():
+        setattr(context, key, value)
 
 
 COLLECTIVE_SOLR_MOCK_REGISTRY_FIXTURE = CollectiveSolrMockRegistryLayer()

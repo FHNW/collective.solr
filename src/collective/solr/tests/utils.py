@@ -10,15 +10,8 @@ from re import search
 from collective.solr.local import getLocal, setLocal
 from collective.solr import tests
 
-try:
-    from zope.component.hooks import getSite, setSite
-except ImportError:
-    from zope.app.component.hooks import getSite, setSite
-
-try:
-    from Zope2.App import zcml
-except ImportError:
-    from Products.Five import zcml
+from zope.component.hooks import getSite, setSite
+from Zope2.App import zcml
 
 
 def loadZCMLString(string):

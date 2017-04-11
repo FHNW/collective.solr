@@ -5,7 +5,7 @@ from StringIO import StringIO
 from DateTime import DateTime
 from Products.ZCatalog.Lazy import Lazy
 from Products.ZCatalog.Lazy import _marker
-from zope.interface import implements
+from zope.interface import implementer
 
 from collective.solr.interfaces import ISolrFlare
 from xml.etree.cElementTree import iterparse
@@ -24,9 +24,9 @@ class AttrDict(dict):
             raise AttributeError(name)
 
 
+@implementer(ISolrFlare)
 class SolrFlare(AttrDict):
     """ a sol(a)r brain, i.e. a data container for search results """
-    implements(ISolrFlare)
 
     __allow_access_to_unprotected_subobjects__ = True
 

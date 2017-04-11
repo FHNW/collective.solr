@@ -6,7 +6,7 @@ from BTrees.IIBTree import IITreeSet
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
 from plone.uuid.interfaces import IUUID, IUUIDAware
-from zope.interface import implements
+from zope.interface import implementer
 from zope.component import queryUtility, queryAdapter
 from collective.solr.indexer import DefaultAdder
 from collective.solr.flare import PloneFlare
@@ -21,16 +21,6 @@ from collective.solr.parser import SolrResponse
 from collective.solr.parser import unmarshallers
 from collective.solr.utils import findObjects
 from collective.solr.utils import prepareData
-
-import pkg_resources
-
-
-try:   # pragma: no cover
-    pkg_resources.get_distribution('collective.indexing')
-    from collective.indexing.indexer import getOwnIndexMethod
-    HAS_C_INDEXING = True
-except pkg_resources.DistributionNotFound:  # pragma: no cover
-    HAS_C_INDEXING = False
 
 
 logger = getLogger('collective.solr.maintenance')
@@ -70,9 +60,9 @@ def notimeout(func):
     return wrapper
 
 
+@implementer(ISolrMaintenanceView)
 class SolrMaintenanceView(BrowserView):
     """ helper view for indexing all portal content in Solr """
-    implements(ISolrMaintenanceView)
 
     def mklog(self, use_std_log=False):
         """ helper to prepend a time stamp to the output """
@@ -158,12 +148,6 @@ class SolrMaintenanceView(BrowserView):
 
         for path, obj in findObjects(self.context):
             if ICheckIndexable(obj)():
-
-                if HAS_C_INDEXING and \
-                        getOwnIndexMethod(obj, 'indexObject') is not None:
-                    log('skipping indexing of %r via private method.\n' % obj)
-                    continue
-
                 count += 1
                 if count <= skip:
                     continue
