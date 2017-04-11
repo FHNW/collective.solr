@@ -211,9 +211,12 @@ class SolrIndexProcessor(object):
                     attributes.extend(['path_string', 'path_parents',
                                        'path_depth'])
 
-                attributes = set(schema.keys()).intersection(attributes)
-                if not attributes:
-                    return
+                if attributes:
+                    attributes = set(schema.keys()).intersection(attributes)
+                    if not attributes:
+                        return
+                else:
+                    attributes = schema.keys()
 
                 if uniqueKey not in attributes:
                     # The uniqueKey is required in order to identify the
