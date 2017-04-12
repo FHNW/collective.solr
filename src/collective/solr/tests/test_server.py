@@ -287,7 +287,7 @@ class SolrMaintenanceTests(TestCase):
                           ignore_exceptions=False)
         # ignore_exceptions=True should commit the reindex tx.
         # The object causing the exception will not be indexed
-        # maintenance.reindex(ignore_exceptions=True)
+        maintenance.reindex(ignore_exceptions=True)
         self.assertEqual(numFound(self.search()), len(DEFAULT_OBJS))
         # restore defaults
         sm.unregisterAdapter(RaisingAdder,

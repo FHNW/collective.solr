@@ -35,6 +35,30 @@
         factory=".dispatcher.SearchDispatcher" />
 
 
+    <configure zcml:condition="installed Products.Archetypes">
+
+      <!-- Schema extender -->
+      <include file="extender.zcml" />
+
+      <!-- Adder adapter for Archetypes-->
+      <adapter
+	  factory=".indexer.DefaultAdder"
+	  for="Products.Archetypes.interfaces.IBaseObject"
+	  name="default"
+	  />
+
+      <adapter
+	  factory=".indexer.BinaryAdder"
+	  for="Products.Archetypes.interfaces.IBaseObject"
+	  name="File"
+	  />
+
+      <adapter
+	  factory=".indexer.BinaryAdder"
+	  for="Products.Archetypes.interfaces.IBaseObject"
+	  name="Image"
+	  />
+    </configure>
 
       <!-- Schema extender as behavior -->
       <plone:behavior
