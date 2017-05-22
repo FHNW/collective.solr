@@ -1,8 +1,8 @@
 Changelog
 =========
 
-6.0a2 (unreleased)
-------------------
+6.0a1.post1 (2017-05-22)
+------------------------
 
 - Fixed React widget to add cookies while fetching @search endpoint
   [sneridagh]
