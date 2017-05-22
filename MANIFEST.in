@@ -7,8 +7,9 @@ exclude .gitattributes
 exclude tox.ini
 global-exclude *.pyc
 global-exclude .*py.un~
-include docs/LICENSE.GPL
+include docs/LICENSE.GPL *.txt
 recursive-include docs *.rst
+recursive-include docs *.png
 recursive-include docs *.py
 recursive-include docs *.txt
 include *.rst
