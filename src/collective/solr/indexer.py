@@ -12,7 +12,6 @@ from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
-from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
 from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
 from zope.component import getUtility
@@ -28,6 +27,16 @@ from collective.solr.utils import getConfig
 from socket import error
 from urllib import urlencode
 
+import pkg_resources
+
+INDEXABLE_CLASSES = [CMFCatalogAware,]
+try:  # pragma: no cover
+    pkg_resources.get_distribution('Products.Archetypes')
+    from Products.Archetypes.CatalogMultiplex import CatalogMultiplex
+    INDEXABLE_CLASSES.append(CatalogMultiplex)
+except pkg_resources.DistributionNotFound:  # pragma: no cover
+    pass
+INDEXABLE_CLASSES = tuple(INDEXABLE_CLASSES)
 
 logger = getLogger('collective.solr.indexer')
 
@@ -40,8 +49,7 @@ class BaseIndexable(object):
         self.context = context
 
     def __call__(self):
-        return isinstance(self.context, CatalogMultiplex) or \
-            isinstance(self.context, CMFCatalogAware)
+        return isinstance(self.context, INDEXABLE_CLASSES)
 
 
 def datehandler(value):
