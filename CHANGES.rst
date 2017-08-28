@@ -1,7 +1,13 @@
 Changelog
 =========
 
-6.0a2 (unreleased)
+6.0a3 (unreleased)
+------------------
+
+- Nothing changed yet.
+
+
+6.0a2 (2017-07-17)
 ------------------
 
 - Avoid hard/undeclared dependency on Archetypes
@@ -14,10 +20,15 @@ Changelog
 - Fixed React widget to add cookies while fetching @search endpoint
   [sneridagh]
 
-- solr.cfg: configure JMX host and port separately.  [maurits]
+- Handle non-ascii values in the query.
+  [reinhardt]
+
+- solr.cfg: configure JMX host and port separately.
+  [maurits]
 
 - Added link to Solr sync in our control panel.  Added titles to all
-  four maintenance links that briefly explain what they do.  [maurits]
+  four maintenance links that briefly explain what they do.
+  [maurits]
 
 - Added upgrade step for registry to upgrade from version 5.0.3.
   Otherwise you get KeyError: ``collective.solr.facets`` in the search viewlet.
