@@ -29,7 +29,7 @@ from urllib import urlencode
 
 import pkg_resources
 
-INDEXABLE_CLASSES = [CMFCatalogAware,]
+INDEXABLE_CLASSES = [CMFCatalogAware, ]
 try:  # pragma: no cover
     pkg_resources.get_distribution('Products.Archetypes')
     from Products.Archetypes.CatalogMultiplex import CatalogMultiplex

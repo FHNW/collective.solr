@@ -19,7 +19,6 @@ from logging import getLogger
 from time import time
 from zope.component import queryUtility
 from zope.interface import implementer
-from Products.CMFPlone.utils import safe_unicode
 
 
 logger = getLogger('collective.solr.search')
