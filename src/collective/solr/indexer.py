@@ -423,4 +423,3 @@ def showinsearch(obj):
     if value is None:
         value = True
     return value
-
