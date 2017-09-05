@@ -13,6 +13,8 @@ Changelog
 - Avoid hard/undeclared dependency on Archetypes
   [tomgross]
 
+- Allow setting of actual_result_count (needed by plone.app.querystring)
+  [tomgross]
 
 6.0a1.post1 (2017-05-22)
 ------------------------
