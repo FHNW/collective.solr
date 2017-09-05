@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 from logging import getLogger
 from lxml import etree
+from Acquisition import aq_base
 from Acquisition import aq_get
 from DateTime import DateTime
 from datetime import date, datetime
 from zope.component import queryUtility, queryMultiAdapter
 from zope.component import queryAdapter, adapter
 from zope.interface import implementer
-from zope.interface import Interface
 from ZODB.interfaces import BlobError
 from ZODB.POSException import ConflictError
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.CMFCatalogAware import CMFCatalogAware
+from plone.indexer import indexer
 from plone.indexer.interfaces import IIndexableObjectWrapper
 from plone.indexer.interfaces import IIndexableObject
-from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
+from zope.component import getUtility
+from zope.interface import Interface
 
 from collective.solr.interfaces import ISolrConnectionManager
 from collective.solr.interfaces import ISolrIndexQueueProcessor
@@ -386,3 +388,39 @@ class SolrIndexProcessor(object):
             data[name] = value
         missing = set(schema.requiredFields) - set(data.keys())
         return data, missing
+
+
+@indexer(Interface)
+def searchwords(obj):
+    if getattr(aq_base(obj), 'searchwords', ''):
+        words = obj.searchwords
+    getField = getattr(aq_base(obj), 'searchwords', None)
+    if getField is not None:
+        field = obj.getField('searchwords')
+        words = field.get(obj)
+    if not words:
+        return ()
+    words = [w.strip('\r ').decode('utf-8') for w in words.split('\n')]
+    return tuple([w for w in words if w])
+
+
+@indexer(Interface)
+def showinsearch(obj):
+    # if the object is a dexterity object, check for the showinsearch attribute
+    if getattr(aq_base(obj), 'showinsearch', True) is False:
+        return obj.showinsearch
+    # if the object isn't an Archetype, it should be included
+    getField = getattr(aq_base(obj), 'getField', None)
+    if getField is None:
+        return True
+    # if the object doesn't have the field, it should be included
+    field = obj.getField('showinsearch')
+    if field is None:
+        return True
+    value = field.get(obj)
+    # None is the default value, meaning no value has been set, we treat this
+    # as 'should be included in search'
+    if value is None:
+        value = True
+    return value
+

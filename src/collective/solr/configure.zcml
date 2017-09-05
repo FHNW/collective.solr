@@ -124,6 +124,10 @@
   <adapter name="path_depth" factory=".attributes.path_depth" />
   <adapter name="path_parents" factory=".attributes.path_parents" />
 
+  <!-- Behavior / Extender fields -->
+  <adapter factory=".indexer.searchwords" name="searchwords" />
+  <adapter factory=".indexer.showinsearch" name="showinsearch" />
+
   <adapter
       factory="plone.app.contentlisting.contentlisting.ContentListing"
       for="collective.solr.parser.SolrResponse"
