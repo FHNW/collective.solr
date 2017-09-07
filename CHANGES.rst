@@ -1,7 +1,7 @@
 Changelog
 =========
 
-6.0a3 (unreleased)
+6.0a3 (2017-09-07)
 ------------------
 
 - Avoid hard/undeclared dependency on Archetypes
