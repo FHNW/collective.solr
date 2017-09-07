@@ -392,6 +392,7 @@ class SolrIndexProcessor(object):
 
 @indexer(Interface)
 def searchwords(obj):
+    words = ''
     if getattr(aq_base(obj), 'searchwords', ''):
         words = obj.searchwords
     getField = getattr(aq_base(obj), 'searchwords', None)
