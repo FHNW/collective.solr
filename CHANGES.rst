@@ -4,12 +4,6 @@ Changelog
 6.0a3 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
-
-6.0a2 (2017-07-17)
-------------------
-
 - Avoid hard/undeclared dependency on Archetypes
   [tomgross]
 
