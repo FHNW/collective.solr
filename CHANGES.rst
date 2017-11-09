@@ -4,7 +4,8 @@ Changelog
 6.0a4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Only use solr, if explicitly requested (FHNW patch)
+  [tomgross]
 
 
 6.0a3 (2017-09-07)
