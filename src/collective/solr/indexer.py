@@ -81,6 +81,12 @@ def datehandler(value):
         )
     elif isinstance(value, date):
         value = '%s.000Z' % value.strftime('%Y-%m-%dT%H:%M:%S')
+    elif isinstance(value, list):
+        parsed_values = []
+        for val in value:
+            parsed_val = datehandler(val)
+            parsed_values.append(parsed_val)
+        value = parsed_values
     return value
 
 
